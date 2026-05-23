@@ -1,0 +1,60 @@
+# --- secrets & local config -------------------------------------------------
+# Any env file at any level. Example files (*.env.example) are tracked so
+# contributors know which vars to set.
+.env
+.env.*
+!.env.example
+!*.env.example
+
+# --- Python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual envs (any common name, any depth)
+.venv/
+venv/
+env/
+ENV/
+
+# --- SQLite (translate-api cache) -----------------------------------------
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+
+# --- Node / Next.js -------------------------------------------------------
+node_modules/
+.next/
+out/
+.turbo/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Logs -----------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- OS / editor junk -----------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- Project-local --------------------------------------------------------
+# AI-assistant scratch files (rules, transcripts, etc.) live in .cursor/
+.cursor/
+# Local notes or one-off scripts
+_*.py
+_scratch/

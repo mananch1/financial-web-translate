@@ -1,0 +1,13 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Local virtualenvs
+.venv/
+venv/
+
+# Local env file (none today, but keep this here so a stray .env never gets
+# committed if someone adds one later, e.g. for NSE_BASE override).
+.env
+.env.*
+!.env.example

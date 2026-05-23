@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+
+# SQLite cache (and its WAL / shared-memory sidecars when journal_mode=WAL)
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
