@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+ * NSE design tokens — tuned for presentation mock fidelity.
+ * ------------------------------------------------------------------------- */
+:root {
+  --nse-bg: #ffffff;
+  --nse-page: #f0f3f8;
+  --nse-fg: #1a1a1a;
+  --nse-muted: #6b7280;
+  --nse-border: #dde2ea;
+  --nse-border-strong: #b8c0cc;
+
+  /* brand */
+  --nse-navy: #1d2a5a;
+  --nse-navy-2: #2a3a78;
+  --nse-red: #c8102e;
+  --nse-red-dark: #9f0808;
+  --nse-orange: #f57e20;
+  --nse-green: #008558;
+  --nse-link: #0d4f9f;
+
+  /* tab strip */
+  --nse-tab-bg: #e7ecf3;
+  --nse-tab-active: #ffffff;
+  --nse-tab-border: #c2c8d2;
+}
+
+@theme inline {
+  --color-nse-bg: var(--nse-bg);
+  --color-nse-page: var(--nse-page);
+  --color-nse-fg: var(--nse-fg);
+  --color-nse-muted: var(--nse-muted);
+  --color-nse-border: var(--nse-border);
+  --color-nse-border-strong: var(--nse-border-strong);
+  --color-nse-navy: var(--nse-navy);
+  --color-nse-navy-2: var(--nse-navy-2);
+  --color-nse-red: var(--nse-red);
+  --color-nse-red-dark: var(--nse-red-dark);
+  --color-nse-orange: var(--nse-orange);
+  --color-nse-green: var(--nse-green);
+  --color-nse-link: var(--nse-link);
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html,
+body {
+  background: var(--nse-page);
+  color: var(--nse-fg);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+a {
+  color: var(--nse-link);
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+/* NSE-style focus ring */
+input:focus,
+select:focus,
+button:focus-visible {
+  outline: 2px solid var(--nse-link);
+  outline-offset: 1px;
+}
+
+/* accessibility toggles */
+html[data-contrast="high"] {
+  filter: contrast(1.25);
+}
+html[data-fontsize="lg"]  { font-size: 14px; }
+html[data-fontsize="xl"]  { font-size: 15px; }
+html[data-fontsize="sm"]  { font-size: 12px; }
+
+/* subtle page-title underline accent */
+.nse-page-title {
+  position: relative;
+  padding-bottom: 6px;
+}
+.nse-page-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 48px;
+  height: 3px;
+  background: var(--nse-orange);
+  border-radius: 2px;
+}
