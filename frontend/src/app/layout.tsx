@@ -20,13 +20,13 @@ export const metadata: Metadata = {
 };
 
 // `dynamic = "force-dynamic"` ensures the layout runs per-request so the
-// x-lang header set by middleware is read freshly on every page load.
+// x-lang header set by proxy is read freshly on every page load.
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Middleware sets `x-lang` when the URL matches `/hindi/...` etc.
+  // Proxy sets `x-lang` when the URL matches `/hindi/...` etc.
   // Anything else (or a direct `/` visit) implicitly means English.
   const h = await headers();
   const initialLang = h.get("x-lang") ?? "en";

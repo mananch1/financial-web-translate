@@ -1,7 +1,7 @@
 // Single source of truth for the language registry.
 //
 // Lives in its own file (instead of inside strings.ts) so that
-// `src/middleware.ts` can import it without pulling in the ~115-entry
+// `src/proxy.ts` can import it without pulling in the ~115-entry
 // UI_STRINGS array. Keeping the middleware bundle small matters because
 // it runs on every request that matches the matcher.
 

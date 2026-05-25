@@ -1,22 +1,21 @@
-// Pretty-URL i18n routing.
+// Pretty-URL i18n routing (Next.js 16+ "proxy" convention).
 //
 // Visiting `/hindi/foo` internally renders `/foo` with a request header
 // `x-lang: hi`. The browser URL bar still shows `/hindi/foo`, which is
 // the pattern NSE itself uses.
 //
 // The header is read by `app/layout.tsx` (a server component) and threaded
-// down to `<LangProvider>` as `initialLang`. From that point on the React
-// tree behaves the same way it does for a direct `?lang=hi` visit.
+// down to `<LangProvider>` as `initialLang`.
 //
-// NOTE: when the project uses a `src/` directory this file MUST live at
-// `src/middleware.ts`, not at the repo root, otherwise Next.js silently
-// ignores it.
+// NOTE: Next.js 16 renamed `middleware.ts` → `proxy.ts`. The old file is
+// deprecated and may not run in `next dev` (causing 404 on `/hindi`).
+// This file MUST live at `src/proxy.ts` when using a `src/` directory.
 
 import { NextResponse, type NextRequest } from "next/server";
 
 import { SLUG_TO_CODE } from "@/lib/languages";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const segments = req.nextUrl.pathname.split("/").filter(Boolean);
   const first = segments[0]?.toLowerCase();
   const lang = first ? SLUG_TO_CODE[first] : undefined;
@@ -24,7 +23,8 @@ export function middleware(req: NextRequest) {
 
   // Rewrite to the same URL minus the language prefix.
   const url = req.nextUrl.clone();
-  url.pathname = "/" + segments.slice(1).join("/");
+  const rest = segments.slice(1).join("/");
+  url.pathname = rest ? `/${rest}` : "/";
 
   // Mutate request headers so the server-component layout can read x-lang.
   const requestHeaders = new Headers(req.headers);
@@ -38,8 +38,6 @@ export function middleware(req: NextRequest) {
 // Next.js requires `matcher` to be a statically analysable literal at
 // build time -- no array spreading, flatMap, or imports allowed here.
 // Keep this list in sync with the `slug` values in `lib/languages.ts`.
-// (The middleware function itself uses the imported registry, so adding
-// a slug here is the *only* duplication when wiring a new language.)
 export const config = {
   matcher: [
     "/hindi",      "/hindi/:path*",
