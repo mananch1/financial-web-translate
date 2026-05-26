@@ -143,6 +143,23 @@ export const UI_STRINGS = [
   "Refreshing…",
   "Could not reach NSE. The backend may be warming up — please try again.",
 
+  // --- Page-level nav (between Market and About in our app)
+  "Market",
+  "About NSE",
+  "ABOUT NSE",
+  "About NSE Company",
+
+  // --- About page body
+  "Our Company",
+  "Our Vision",
+  "Our Mission",
+  "National Stock Exchange of India Limited (NSE) is the leading stock exchange in India and ranks among the largest exchanges in the world by trading volume. Established in 1992 and headquartered in Mumbai, NSE pioneered the introduction of fully electronic, screen-based trading and a dematerialised settlement system in India.",
+  "NSE offers a comprehensive range of products and services across the equity, derivatives, debt, currency, and mutual fund segments. The exchange operates one of the most sophisticated electronic trading platforms, with state-of-the-art risk management, clearing, and settlement infrastructure that serves millions of investors every trading day.",
+  "Through its flagship index, the NIFTY 50, NSE provides the benchmark for the Indian capital markets and is widely tracked by domestic and international investors. The exchange also runs technology and indices businesses, financial education programmes, and a regulated marketplace for SMEs, debt instruments, REITs, InvITs, and social enterprises.",
+  "Continually innovating to meet the evolving needs of the market, NSE remains committed to transparency, investor protection, and the development of a robust, world-class capital market for India.",
+  "To be a globally competitive stock exchange that contributes to building a transparent, inclusive, and resilient capital market in India.",
+  "To provide a world-class, technology-driven trading platform that promotes fair, transparent, and efficient price discovery, while empowering investors and contributing to nation-building.",
+
   // --- Footer
   "Quick Links",
   "About Us",

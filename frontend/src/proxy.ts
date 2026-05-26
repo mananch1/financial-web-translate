@@ -21,12 +21,21 @@ export function proxy(req: NextRequest) {
   const lang = first ? SLUG_TO_CODE[first] : undefined;
   if (!lang) return NextResponse.next();
 
-  // Rewrite to the same URL minus the language prefix.
-  const url = req.nextUrl.clone();
-  const rest = segments.slice(1).join("/");
-  url.pathname = rest ? `/${rest}` : "/";
+  // Bare `/<lang>` (no further path): redirect to `/<lang>/market` so the
+  // language homepage points at the actual market view, matching the
+  // English `/` -> `/market` server redirect.
+  if (segments.length === 1) {
+    const target = req.nextUrl.clone();
+    target.pathname = `/${first}/market`;
+    return NextResponse.redirect(target);
+  }
 
-  // Mutate request headers so the server-component layout can read x-lang.
+  // `/<lang>/<rest>`: rewrite to `/<rest>` and stash the language in
+  // a request header so the server-component layout can pre-fetch the
+  // dictionary before the first paint.
+  const url = req.nextUrl.clone();
+  url.pathname = "/" + segments.slice(1).join("/");
+
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set("x-lang", lang);
 

@@ -11,7 +11,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import { loadDictionary, type Dictionary } from "./i18n";
+import { loadDictionaryOrNull, type Dictionary } from "./i18n";
 import {
   CODE_TO_SLUG,
   LANGUAGE_CODES,
@@ -106,11 +106,14 @@ export function LangProvider({
     let cancelled = false;
     const ctrl = new AbortController();
     setReady(false);
-    void loadDictionary(lang, ctrl.signal).then((d) => {
-      if (!cancelled) {
-        setDict(d);
-        setReady(true);
-      }
+    void loadDictionaryOrNull(lang, ctrl.signal).then((d) => {
+      if (cancelled) return;
+      // On translate-api failure we keep whatever dict is already on
+      // screen rather than blow it away with English. That way the
+      // user sees a stale (but correct-language) chrome instead of
+      // a sudden flip back to English mid-session.
+      if (d) setDict(d);
+      setReady(true);
     });
     return () => {
       cancelled = true;

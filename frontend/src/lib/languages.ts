@@ -63,3 +63,19 @@ export const CODE_TO_SLUG: Readonly<Record<string, string>> = Object.freeze(
 export const PRETTY_SEGMENTS: ReadonlySet<string> = new Set(
   Object.keys(SLUG_TO_CODE),
 );
+
+/**
+ * Build a language-aware href. The canonical English path stays bare;
+ * any other language gets prefixed with its slug.
+ *
+ *   withLang("en", "/market")  -> "/market"
+ *   withLang("hi", "/market")  -> "/hindi/market"
+ *   withLang("hi", "/")        -> "/hindi"
+ *   withLang("xx", "/market")  -> "/market"  (unknown lang -> identity)
+ */
+export function withLang(lang: string, path: string): string {
+  const slug = CODE_TO_SLUG[lang];
+  if (!slug || lang === "en") return path;
+  if (path === "/" || path === "") return `/${slug}`;
+  return `/${slug}${path.startsWith("/") ? path : `/${path}`}`;
+}

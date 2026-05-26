@@ -3,14 +3,25 @@
 // Breadcrumb strip shown between the market ticker and the page title.
 // Matches NSE's pattern of "Home > Companies & Listing > Corporate Filings".
 
-import { useT } from "@/lib/LangProvider";
+import Link from "next/link";
+
+import { useLang } from "@/lib/LangProvider";
+import { withLang } from "@/lib/languages";
 
 export default function Breadcrumb({
   items,
 }: {
   items: { label: string; href?: string }[];
 }) {
-  const t = useT();
+  const { lang, t } = useLang();
+
+  // Internal hrefs (start with `/`) get re-prefixed for the current language
+  // so `Home -> /` becomes `Home -> /hindi/market` etc.
+  const resolveHref = (href: string): string => {
+    if (!href || href === "#") return href;
+    if (!href.startsWith("/")) return href;
+    return withLang(lang, href);
+  };
   return (
     <nav
       aria-label="Breadcrumb"
@@ -36,12 +47,12 @@ export default function Breadcrumb({
                   {t(it.label)}
                 </span>
               ) : (
-                <a
-                  href={it.href}
+                <Link
+                  href={resolveHref(it.href)}
                   className="hover:text-[var(--nse-link)] hover:underline"
                 >
                   {t(it.label)}
-                </a>
+                </Link>
               )}
             </li>
           );

@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { fetchAutocomplete } from "@/lib/api";
-import { useT } from "@/lib/LangProvider";
+import { useLang, useT } from "@/lib/LangProvider";
+import { withLang } from "@/lib/languages";
 import type { AutocompleteSymbol } from "@/lib/types";
 import NseLogo from "./NseLogo";
 
@@ -60,12 +63,24 @@ function Chevron({ open }: { open?: boolean }) {
 
 export default function Header() {
   const t = useT();
+  const { lang } = useLang();
+  const pathname = usePathname() || "/";
   const [open, setOpen] = useState<number | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [searchQ, setSearchQ] = useState("");
   const [searchHits, setSearchHits] = useState<SymbolHit[]>([]);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Strip any language prefix so we know which "real" route we're on.
+  // /hindi/about -> /about, /market -> /market.
+  const routePath = pathname.replace(/^\/[a-z]+/, (m) =>
+    /^\/(hindi|marathi|gujarati|bengali|kannada|tamil|telugu|punjabi|malayalam|oriya|assamese|urdu)$/i.test(m)
+      ? ""
+      : m,
+  ) || "/";
+  const isAbout = routePath === "/about";
+  const isMarket = !isAbout; // /, /market, /market/...
 
   useEffect(() => {
     if (!searchQ.trim()) {
@@ -91,9 +106,39 @@ export default function Header() {
       {/* Logo row */}
       <div className="border-b border-[var(--nse-border)]">
         <div className="mx-auto max-w-[1280px] flex items-center justify-between gap-4 px-4 py-3">
-          <a href="#" className="flex items-center">
-            <NseLogo />
-          </a>
+          <div className="flex items-center gap-6">
+            <Link
+              href={withLang(lang, "/market")}
+              aria-label="NSE home"
+              className="flex items-center"
+            >
+              <NseLogo />
+            </Link>
+
+            {/* Page-level route switch (Market / About). Kept simple and
+                always visible so the demo's two views are easy to find.
+                No active-state highlight per user preference -- just a
+                subtle hover. */}
+            <nav
+              aria-label="Site sections"
+              className="hidden md:flex items-center gap-1 text-[12px]"
+            >
+              <Link
+                href={withLang(lang, "/market")}
+                aria-current={isMarket ? "page" : undefined}
+                className="px-2.5 py-1 rounded-sm font-semibold tracking-wide text-[var(--nse-navy)] hover:bg-[var(--nse-page)] transition-colors"
+              >
+                {t("Market")}
+              </Link>
+              <Link
+                href={withLang(lang, "/about")}
+                aria-current={isAbout ? "page" : undefined}
+                className="px-2.5 py-1 rounded-sm font-semibold tracking-wide text-[var(--nse-navy)] hover:bg-[var(--nse-page)] transition-colors"
+              >
+                {t("About NSE")}
+              </Link>
+            </nav>
+          </div>
 
           <div className="flex items-center gap-2">
             {/* Search trigger */}

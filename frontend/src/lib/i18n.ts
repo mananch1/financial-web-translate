@@ -77,6 +77,89 @@ function identityDict(): Dictionary {
   return d;
 }
 
+/**
+ * Strict variant used by `app/layout.tsx` for the SSR pre-fetch.
+ *
+ * Difference from `loadDictionary`:
+ *   * Returns `null` on failure instead of an English identity dict.
+ *
+ * Why we need both:
+ *   * Client callers want a non-nullable dict so they can blindly do
+ *     `dict[key] ?? key` — identity is a harmless fallback.
+ *   * The SSR caller MUST distinguish "real translation" from "fallback"
+ *     because that dict is shipped as a prop to `LangProvider`. If we
+ *     ship identity, the client assumes the page is already translated
+ *     and refuses to re-fetch — so the user sees English on /hindi.
+ */
+// Hard ceiling on how long SSR will wait for translate-api before giving
+// up and letting the client take over. On a cold cache Groq can easily
+// take 30-60s to translate the full UI dict; blocking SSR for that long
+// would make the first paint feel broken.
+const SSR_TIMEOUT_MS = 8000;
+
+export async function loadDictionaryOrNull(
+  lang: string,
+  signal?: AbortSignal,
+): Promise<Dictionary | null> {
+  if (lang === "en") return null;
+  if (dictCache.has(lang)) return dictCache.get(lang)!;
+
+  // Compose the caller's signal (if any) with our SSR timeout so we
+  // always bail within SSR_TIMEOUT_MS. The client useEffect re-issues
+  // the request without this ceiling.
+  const timeoutCtrl = new AbortController();
+  const timer = setTimeout(() => timeoutCtrl.abort(), SSR_TIMEOUT_MS);
+  const composedSignal = signal
+    ? anySignal([signal, timeoutCtrl.signal])
+    : timeoutCtrl.signal;
+
+  try {
+    const r = await fetch(`${TRANSLATE_API}/translate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        language: lang,
+        texts: UI_STRINGS as readonly string[],
+      }),
+      signal: composedSignal,
+    });
+    if (!r.ok) return null;
+    const data = (await r.json()) as TranslateResponse;
+    const dict: Dictionary = {};
+    let translated = 0;
+    UI_STRINGS.forEach((src, i) => {
+      const out = data.translations[i] ?? src;
+      dict[src] = out;
+      if (out !== src) translated += 1;
+    });
+    // Sanity check: if every translation came back equal to the source
+    // (e.g. translate-api degraded to a passthrough), treat as failure.
+    if (translated === 0) return null;
+    dictCache.set(lang, dict);
+    return dict;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Tiny AbortSignal.any polyfill for Node runtimes that don't have it yet.
+ * Aborts the returned signal as soon as any input signal aborts.
+ */
+function anySignal(signals: AbortSignal[]): AbortSignal {
+  const ctrl = new AbortController();
+  for (const s of signals) {
+    if (s.aborted) {
+      ctrl.abort();
+      break;
+    }
+    s.addEventListener("abort", () => ctrl.abort(), { once: true });
+  }
+  return ctrl.signal;
+}
+
 // ---------------------------------------------------------------------------
 // Live-data row translator
 // ---------------------------------------------------------------------------

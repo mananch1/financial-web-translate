@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { Suspense } from "react";
-import { loadDictionary } from "@/lib/i18n";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import MarketTicker from "@/components/MarketTicker";
+import TopUtilityBar from "@/components/TopUtilityBar";
+import { loadDictionaryOrNull } from "@/lib/i18n";
 import { LangProvider } from "@/lib/LangProvider";
 import "./globals.css";
 
@@ -37,9 +41,15 @@ export default async function RootLayout({
   //
   // After the first request per language per server process the in-memory
   // `dictCache` map in i18n.ts keeps subsequent SSR fetches free (~0ms).
-  // English short-circuits to identity and skips the network entirely.
+  // English short-circuits to null and skips the network entirely.
+  //
+  // We use the *strict* variant: on translate-api failure it returns null
+  // instead of an English identity dict. That distinction matters --
+  // shipping identity to <LangProvider> would lock the page into English
+  // even on a /hindi URL, which is exactly the bug we hit when Groq's
+  // free-tier rate limit kicked in mid-session.
   const initialDict =
-    initialLang === "en" ? null : await loadDictionary(initialLang);
+    initialLang === "en" ? null : await loadDictionaryOrNull(initialLang);
 
   return (
     <html lang={initialLang} className={`${inter.className} h-full`}>
@@ -51,7 +61,13 @@ export default async function RootLayout({
             initialLang={initialLang}
             initialDict={initialDict}
           >
+            {/* Site-wide chrome lives here so every /market and /about
+                page shares it without re-mounting components on nav. */}
+            <TopUtilityBar />
+            <Header />
+            <MarketTicker />
             {children}
+            <Footer />
           </LangProvider>
         </Suspense>
       </body>
