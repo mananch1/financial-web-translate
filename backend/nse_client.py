@@ -48,7 +48,7 @@ WARMUP_PATHS: tuple[str, ...] = (
 )
 
 # How long a warmed session is considered fresh (seconds).
-SESSION_TTL_SECONDS = 8 * 60
+SESSION_TTL_SECONDS = 8 
 
 
 class NSEClient:
@@ -61,7 +61,7 @@ class NSEClient:
         self._client = httpx.AsyncClient(
             base_url=NSE_BASE,
             headers=DEFAULT_HEADERS,
-            timeout=httpx.Timeout(15.0, connect=10.0),
+            timeout=httpx.Timeout(1.0, connect=1.0),
             follow_redirects=True,
             http2=False,
         )
