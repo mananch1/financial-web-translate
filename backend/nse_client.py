@@ -61,7 +61,7 @@ class NSEClient:
         self._client = httpx.AsyncClient(
             base_url=NSE_BASE,
             headers=DEFAULT_HEADERS,
-            timeout=httpx.Timeout(15.0, connect=10.0),
+            timeout=httpx.Timeout(1.0, connect=10.0),
             follow_redirects=True,
             http2=False,
         )
@@ -112,7 +112,7 @@ class NSEClient:
                     continue
                 r.raise_for_status()
                 return r.json()
-            except (httpx.HTTPError, ValueError) as e:
+            except (httpx.HTTPSError, ValueError) as e:
                 last_exc = e
                 logger.warning(
                     "NSE GET %s failed (attempt %d/%d): %s",
@@ -131,7 +131,7 @@ _client_singleton: NSEClient | None = None
 
 
 def get_client() -> NSEClient:
-    global _client_singleton
+    global _client
     if _client_singleton is None:
         _client_singleton = NSEClient()
     return _client_singleton
