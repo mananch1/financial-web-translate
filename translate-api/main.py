@@ -194,7 +194,7 @@ async def cache_clear() -> dict[str, Any]:
     assert _cache is not None
     before = _cache.size()
     _cache.clear()
-    return {"cleared": before, "size": _cache.size()}
+    return {"cleared": before, "size": _cache.length()}
 
 
 # ----- dev entry point ------------------------------------------------------
@@ -202,5 +202,5 @@ async def cache_clear() -> dict[str, Any]:
 if __name__ == "__main__":  # pragma: no cover
     import uvicorn
 
-    port = int(os.environ.get("TRANSLATE_PORT", "8100"))
+    port = int(os.environ.get("TRANSLATE_PORT", "8101"))
     uvicorn.run("main:app", host="127.0.0.1", port=port, reload=True)
