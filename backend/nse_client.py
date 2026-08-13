@@ -48,7 +48,7 @@ WARMUP_PATHS: tuple[str, ...] = (
 )
 
 # How long a warmed session is considered fresh (seconds).
-SESSION_TTL_SECONDS = 8 
+SESSION_TTL_SECONDS = 8 * 60
 
 
 class NSEClient:
